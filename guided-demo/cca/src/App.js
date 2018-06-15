@@ -2,16 +2,12 @@ import React, { Component } from 'react';
 import CCA from './cca';
 import './App.css';
 
-const canvasWidth = 400;
-const canvasHeight = 300;
+const canvasWidth = 600;
+const canvasHeight = 400;
 
 const COLORS = [
   [0, 0, 0],
-  [0x8f, 0, 0x5f],
-  [0x5f, 0, 0x8f],
-  [0, 0, 0xff],
   [0, 0x5f, 0x7f],
-  [0x5f, 0x8f, 0x7f],
   [0x8f, 0xff, 0x7f],
   [0xff, 0x5f, 0x7f],
 ];
@@ -33,32 +29,46 @@ class CCACanvas extends Component {
    * Component did mount
    */
   componentDidMount() {
-    this.animFrame();
+    requestAnimationFrame(() => {
+      this.animFrame();
+    });
   }
 
   /**
    * Handle an animation frame
    */
   animFrame() {
-    // let canvas = document.getElementById('canvas');
+    //
+    // !!!! IMPLEMENT ME !!!!
+    //
+
     let canvas = this.refs.canvas;
-    let ctx = canvas.msGetInputContext('2d');
+    let ctx = canvas.getContext('2d');
 
     let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let cells = this.cca.getCells();
+    let screenBuffer = imageData.data;
 
-    // Here is the screen buffer array we can manipulate:
+    for (let height = 0; height < canvasHeight; height++) {
+      for (let width = 0; width < canvasWidth; width++) {
+        let index = (height * canvasWidth + width) * 4;
+        let ccaStatus = cells[height][width];
 
-    let screnBuffer = imageData.data;
-
-    for (let i = 0; i < 1000; i += 4) {
-      // R B G A - 0 is empty and 255 is max.
-      screenBuffer[i + 0] = 0; // R
-      screenBuffer[i + 1] = 0; // G
-      screenBuffer[i + 2] = 0; // B
-      screenBuffer[i + 3] = 255; // A
+        screenBuffer[index + 0] = COLORS[ccaStatus][0];
+        screenBuffer[index + 1] = COLORS[ccaStatus][1];
+        screenBuffer[index + 2] = COLORS[ccaStatus][2];
+        screenBuffer[index + 3] = 255;
+      }
     }
 
-    console.log('screenBuffer in animFrame: ', screenBuffer);
+    console.log('Screenbuffer in animFrame', screenBuffer);
+    ctx.putImageData(imageData, 0, 0);
+    setInterval(() => {
+      this.cca.step();
+      requestAnimationFrame(() => {
+        this.animFrame();
+      });
+    }, 1000);
   }
 
   /**
@@ -95,7 +105,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <CCAApp />
+        <LifeApp />
       </div>
     );
   }

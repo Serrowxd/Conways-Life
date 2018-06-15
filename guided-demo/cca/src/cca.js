@@ -1,8 +1,6 @@
 /**
- * Implemention of a CCA
+ * Implementation of Conway's game of Life
  */
-
-const MODULO = 8;
 
 /**
  * Make a 2D array helper function
@@ -26,12 +24,12 @@ class CCA {
    * Constructor
    */
   constructor(width, height) {
+    // !!!! IMPLEMENT ME !!!!
     this.width = width;
     this.height = height;
-
-    this.cells = Array2D(width, height);
+    this.cells = [Array2D(width, height), Array2D(width, height)];
+    this.currentBufferIndex = 0;
     this.randomize();
-
     this.clear();
   }
 
@@ -40,20 +38,27 @@ class CCA {
    *
    * This should NOT be modified by the caller
    */
-  getCells() {}
+  getCells() {
+    // !!!! IMPLEMENT ME !!!!
+    return this.cells[this.currentBufferIndex];
+  }
 
   /**
-   * Clear the cca grid
+   * Clear the CCA grid
    */
-  clear() {}
+  clear() {
+    // !!!! IMPLEMENT ME !!!!
+  }
 
   /**
-   * Randomize the cca grid
+   * Randomize the CCA grid
    */
   randomize() {
+    // !!!! IMPLEMENT ME !!!!
     for (let height = 0; height < this.height; height++) {
       for (let width = 0; width < this.width; width++) {
-        this.cells[height][width] = (Math.random() * MODULO) | 0; // gives a bitwise opperator between 0 and 7.
+        this.cells[this.currentBufferIndex][height][width] =
+          (Math.random() * MODULO) | 0;
       }
     }
   }
@@ -61,7 +66,75 @@ class CCA {
   /**
    * Run the simulation for a single step
    */
-  step() {}
+  step() {
+    // !!!! IMPLEMENT ME !!!!
+    let currentBuffer = this.cells[this.currentBufferIndex];
+    let backBuffer = this.cells[this.currentBufferIndex === 0 ? 1 : 0];
+
+    function hasInfectiousNeighbor(height, width) {
+      const nextValue = (currentBuffer[height][width] + 3) % MODULO;
+
+      if (width > 0) {
+        if (currentBuffer[height][width - 1] === nextValue) {
+          return true;
+        }
+      }
+
+      if (height > 0) {
+        if (currentBuffer[height - 1][width] === nextValue) {
+          return true;
+        }
+      }
+
+      if (width < this.width - 1) {
+        if (currentBuffer[height][width + 1] === nextValue) {
+          return true;
+        }
+      }
+
+      if (height < this.height - 1) {
+        if (currentBuffer[height + 1][width] === nextValue) {
+          return true;
+        }
+      }
+
+      if (height < this.height - 1 && width > 0) {
+        if (currentBuffer[height + 1][width - 1] === nextValue) {
+          return true;
+        }
+      }
+
+      if (height < this.height - 1 && width > this.width - 1) {
+        if (currentBuffer[height + 1][width + 1] === nextValue) {
+          return true;
+        }
+      }
+
+      if (height < this.height - 1) {
+        if (currentBuffer[height + 1][width] === nextValue) {
+          return true;
+        }
+      }
+
+      if (height < this.height - 1) {
+        if (currentBuffer[height + 1][width] === nextValue) {
+          return true;
+        }
+      }
+    }
+
+    for (let height = 0; height < this.height; height++) {
+      for (let width = 0; width < this.width; width++) {
+        if (hasInfectiousNeighbor.call(this, height, width)) {
+          backBuffer[height][width] =
+            (currentBuffer[height][width] + 3) % MODULO;
+        } else {
+          backBuffer[height][width] = currentBuffer[height][width];
+        }
+      }
+    }
+    this.currentBufferIndex = this.currentBufferIndex === 0 ? 1 : 0;
+  }
 }
 
 export default CCA;
